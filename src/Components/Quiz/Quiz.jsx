@@ -43,6 +43,7 @@ const Quiz = () => {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer ${import.meta.env.VITE_API_KEY}`,
         },
         body: JSON.stringify({
           model: 'gpt-3.5-turbo',
@@ -61,7 +62,7 @@ const Quiz = () => {
   
       if (!data.choices || data.choices.length === 0) {
         console.error('No choices returned from the API');
-        return; 
+        return; // Hoặc hiển thị một thông báo cho người dùng
       }
   
       const questionsText = data.choices[0].message.content.trim();
