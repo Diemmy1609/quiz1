@@ -16,18 +16,19 @@ const Quiz = () => {
   const [topicSelected, setTopicSelected] = useState(null);
 
   const fetchQuestions = async (topicId) => {
-    const topics = {
-      1: "Math",
-      2: "Science",
-      3: "History",
-      4: "Geography",
-      5: "Literature",
-      6: "Music",
-      7: "Art",
-      8: "Sports",
-      9: "Technology",
-      10: "Movies",
-    };
+    const topics =[
+      { id: 1, name: 'Space Exploration' },
+      { id: 2, name: 'Environmental Science' },
+      { id: 3, name: 'World History' },
+      { id: 4, name: 'Ancient Civilizations' },
+      { id: 5, name: 'Modern Technology' },
+      { id: 6, name: 'Philosophy' },
+      { id: 7, name: 'Mythology' },
+      { id: 8, name: 'Popular Culture' },
+      { id: 9, name: 'Health and Wellness' },
+      { id: 10, name: 'Famous Inventions' },
+    ];
+  
   
     const selectedTopic = topics[topicId];
     const localStorageKey = `quizQuestions_${topicId}`;
@@ -224,28 +225,29 @@ const Quiz = () => {
         </div>
 
         <div className="index grid grid-cols-5 gap-1 mt-4">
-          {questions.slice(0, 15).map((_, index) => {
-            const isSelected = currentIndex === index;
-            let bgColor = 'bg-gray-300';
-            let borderColor = isSelected ? 'border-blue-500' : 'border-transparent';
+  {questions.slice(0, 15).map((_, index) => {
+    const isSelected = currentIndex === index;
+    let bgColor = 'bg-gray-300';
+    let borderColor = isSelected ? 'border-blue-500' : 'border-transparent';
 
-            if (selectedOptions[index]) {
-              bgColor = 'bg-green-500'; 
-            } else if (skippedQuestions.has(index)) {
-              bgColor = 'bg-red-500'; 
-            }
+    if (selectedOptions[index]) {
+      bgColor = 'bg-green-500'; 
+    } else if (skippedQuestions.has(index)) {
+      bgColor = 'bg-red-500'; 
+    }
 
-            return (
-              <div
-                key={index}
-                className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full flex items-center justify-center cursor-pointer ${bgColor} text-white border-2 ${borderColor} hover:bg-blue-500`}
-                onClick={() => handleCircleClick(index)}
-              >
-                {index + 1}
-              </div>
-            );
-          })}
-        </div>
+    return (
+      <div
+        key={index}
+        className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full flex items-center justify-center cursor-pointer ${bgColor} text-white border-2 ${borderColor} hover:bg-blue-500`}
+        onClick={() => handleCircleClick(index)}
+      >
+        {index + 1}
+      </div>
+    );
+  })}
+</div>
+
 
         {showPopup && (
           <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
