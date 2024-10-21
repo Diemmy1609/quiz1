@@ -23,9 +23,9 @@ const Quiz = () => {
       { id: 4, name: 'ReactJS' },
       { id: 5, name: 'JavaScript' },
     ];
-    
+
     const selectedTopic = topics.find(topic => topic.id === topicId);
-    
+
     try {
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -46,32 +46,27 @@ const Quiz = () => {
       });
 
       const data = await response.json();
-      console.log('API Response:', data); // Log the full response
-  
+
       if (!data.choices || data.choices.length === 0) {
         console.error('No choices returned from the API');
         return;
       }
-  
+
       const questionsText = data.choices[0].message.content.trim();
       console.log('Raw Questions Text:', questionsText);
-  
-      // Sanitize the output
+
       let formattedText = questionsText
-        .replace(/^json\s*/, '')  // Remove 'json' prefix if it exists
-        .replace(/```.*?```/g, '') // Remove code block formatting
-        .replace(/`/g, '') // Remove inline code formatting
+        .replace(/^(json\s*)?/, '')  
+        .replace(/```.*?```/g, '') 
+        .replace(/`/g, '') 
         .trim();
-  
-      console.log('Formatted Questions Text:', formattedText);
-  
-      // Try to parse the JSON
+
       try {
         const questions = JSON.parse(formattedText);
         setQuestions(questions);
       } catch (error) {
         console.error('Error parsing questions:', error);
-        console.error('Invalid JSON:', formattedText);
+        console.error('Invalid JSON:', formattedText); 
       }
     } catch (error) {
       console.error('Error fetching questions:', error);
@@ -203,13 +198,11 @@ const Quiz = () => {
                 <span>Prev</span>
               </button>
             )}
-            <button 
-              className="btn btn_outline" 
-              onClick={handleNext} 
-              disabled={currentIndex === questions.length - 1} // Disable when on the last question
-            >
-              <span>Next</span>
-            </button>
+            {currentIndex < questions.length - 1 && ( // Only show Next button if not on last question
+              <button className="btn btn_outline" onClick={handleNext}>
+                <span>Next</span>
+              </button>
+            )}
             {currentIndex === questions.length - 1 && (
               <button className="btn btn_outline" onClick={submitAnswers}>
                 <span>Submit</span>
