@@ -62,7 +62,7 @@ const Quiz = () => {
   
       if (!data.choices || data.choices.length === 0) {
         console.error('No choices returned from the API');
-        return; // Hoặc hiển thị một thông báo cho người dùng
+        return; 
       }
   
       const questionsText = data.choices[0].message.content.trim();
@@ -150,8 +150,8 @@ const Quiz = () => {
   };
 
   const handleBack = () => {
-    setTopicSelected(null); // Quay về màn hình chọn chủ đề
-    setQuestions([]); // Xóa câu hỏi đã lưu
+    setTopicSelected(null); 
+    setQuestions([]); 
   };
 
   if (finished) {

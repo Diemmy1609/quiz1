@@ -46,9 +46,9 @@ const TopicSelection = ({ onSelectTopic }) => {
       const data = await response.json();
       if (data.choices && data.choices.length > 0) {
         const topics = data.choices[0].message.content.split('\n').map((topic) => ({
-          id: Date.now() + Math.random(), // Tạo ID ngẫu nhiên
-          name: topic.trim(), // Bỏ dấu cách ở đầu và cuối
-        })).filter(topic => topic.name); // Lọc các mục trống
+          id: Date.now() + Math.random(), 
+          name: topic.trim(), 
+        })).filter(topic => topic.name); 
         setFetchedTopics(topics);
       } else {
         setFetchedTopics([]);
