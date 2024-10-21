@@ -16,29 +16,16 @@ const Quiz = () => {
   const [topicSelected, setTopicSelected] = useState(null);
 
   const fetchQuestions = async (topicId) => {
-    const topics =[
-      { id: 1, name: 'Space Exploration' },
-      { id: 2, name: 'Environmental Science' },
-      { id: 3, name: 'World History' },
-      { id: 4, name: 'Ancient Civilizations' },
-      { id: 5, name: 'Modern Technology' },
-      { id: 6, name: 'Philosophy' },
-      { id: 7, name: 'Mythology' },
-      { id: 8, name: 'Popular Culture' },
-      { id: 9, name: 'Health and Wellness' },
-      { id: 10, name: 'Famous Inventions' },
+    const topics = [
+      { id: 1, name: 'GIT' },
+      { id: 2, name: 'CSS' },
+      { id: 3, name: 'HTML' },
+      { id: 4, name: 'ReactJS' },
+      { id: 5, name: 'JavaScript' },
     ];
-  
-  
-    const selectedTopic = topics[topicId];
-    const localStorageKey = `quizQuestions_${topicId}`;
-  
-    const cachedQuestions = localStorage.getItem(localStorageKey);
-    if (cachedQuestions) {
-      setQuestions(JSON.parse(cachedQuestions));
-      return;
-    }
-  
+    
+    const selectedTopic = topics.find(topic => topic.id === topicId);
+    
     try {
       const response = await fetch('https://api.openai.com/v1/chat/completions', {
         method: 'POST',
@@ -51,39 +38,49 @@ const Quiz = () => {
           messages: [
             {
               role: 'user',
-              content: `Generate 15 quiz questions about ${selectedTopic}. Each question should have four answer options and indicate the correct answer. Please format it as a valid JSON array of objects, where each object has "question", "options", and "answer".`
+              content: `Please generate 15 quiz questions specifically about ${selectedTopic.name}. Each question should include four answer options and clearly indicate the correct answer. Format the output as a valid JSON array of objects, where each object contains "question", "options", and "answer".`
             },
           ],
           max_tokens: 1000,
         }),
       });
-  
+
       const data = await response.json();
-      console.log('API Response:', data);
+      console.log('API Response:', data); // Log the full response
   
       if (!data.choices || data.choices.length === 0) {
         console.error('No choices returned from the API');
-        return; 
+        return;
       }
   
       const questionsText = data.choices[0].message.content.trim();
-      const formattedText = questionsText.replace(/```.*?```/g, '').replace(/`/g, '');
+      console.log('Raw Questions Text:', questionsText);
   
+      // Sanitize the output
+      let formattedText = questionsText
+        .replace(/^json\s*/, '')  // Remove 'json' prefix if it exists
+        .replace(/```.*?```/g, '') // Remove code block formatting
+        .replace(/`/g, '') // Remove inline code formatting
+        .trim();
+  
+      console.log('Formatted Questions Text:', formattedText);
+  
+      // Try to parse the JSON
       try {
         const questions = JSON.parse(formattedText);
         setQuestions(questions);
-        localStorage.setItem(localStorageKey, JSON.stringify(questions));
       } catch (error) {
         console.error('Error parsing questions:', error);
+        console.error('Invalid JSON:', formattedText);
       }
     } catch (error) {
       console.error('Error fetching questions:', error);
     }
   };
-  
+
   useEffect(() => {
-    if (topicSelected) {
-      setElapsedTime(0); // Reset thời gian khi chọn topic mới
+    if (topicSelected !== null) {
+      setElapsedTime(0);
       fetchQuestions(topicSelected);
     }
   }, [topicSelected]);
@@ -167,7 +164,7 @@ const Quiz = () => {
     );
   }
 
-  if (!topicSelected) {
+  if (topicSelected === null) {
     return <TopicSelection onSelectTopic={setTopicSelected} />;
   }
 
@@ -206,10 +203,14 @@ const Quiz = () => {
                 <span>Prev</span>
               </button>
             )}
-            <button className="btn btn_outline" onClick={handleNext} disabled={currentIndex === questions.length - 1}>
+            <button 
+              className="btn btn_outline" 
+              onClick={handleNext} 
+              disabled={currentIndex === questions.length - 1} // Disable when on the last question
+            >
               <span>Next</span>
             </button>
-            {currentIndex > 0 && (
+            {currentIndex === questions.length - 1 && (
               <button className="btn btn_outline" onClick={submitAnswers}>
                 <span>Submit</span>
               </button>
@@ -225,29 +226,28 @@ const Quiz = () => {
         </div>
 
         <div className="index grid grid-cols-5 gap-1 mt-4">
-  {questions.slice(0, 15).map((_, index) => {
-    const isSelected = currentIndex === index;
-    let bgColor = 'bg-gray-300';
-    let borderColor = isSelected ? 'border-blue-500' : 'border-transparent';
+          {questions.map((_, index) => {
+            const isSelected = currentIndex === index;
+            let bgColor = 'bg-gray-300';
+            let borderColor = isSelected ? 'border-blue-500' : 'border-transparent';
 
-    if (selectedOptions[index]) {
-      bgColor = 'bg-green-500'; 
-    } else if (skippedQuestions.has(index)) {
-      bgColor = 'bg-red-500'; 
-    }
+            if (selectedOptions[index]) {
+              bgColor = 'bg-green-500'; 
+            } else if (skippedQuestions.has(index)) {
+              bgColor = 'bg-red-500'; 
+            }
 
-    return (
-      <div
-        key={index}
-        className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full flex items-center justify-center cursor-pointer ${bgColor} text-white border-2 ${borderColor} hover:bg-blue-500`}
-        onClick={() => handleCircleClick(index)}
-      >
-        {index + 1}
-      </div>
-    );
-  })}
-</div>
-
+            return (
+              <div
+                key={index}
+                className={`w-10 h-10 sm:w-12 sm:h-12 md:w-14 md:h-14 lg:w-16 lg:h-16 rounded-full flex items-center justify-center cursor-pointer ${bgColor} text-white border-2 ${borderColor} hover:bg-blue-500`}
+                onClick={() => handleCircleClick(index)}
+              >
+                {index + 1}
+              </div>
+            );
+          })}
+        </div>
 
         {showPopup && (
           <div className="absolute inset-0 flex items-center justify-center bg-black bg-opacity-50">
